@@ -24,4 +24,9 @@ Stack: Vite + Three.js + Rapier (`@dimforge/rapier3d-compat`) + vanilla JS (ES m
 
 - Physics runs at a fixed timestep (`CONFIG.physics.timestep`) with an accumulator; rendering interpolates between the last two physics states.
 - Rapier must be initialised (`await RAPIER.init()`) before any physics object is created — see `src/core/physics.js`.
+- The bike is a Rapier **multibody** (frame = root; steerer, fork lowers, swingarm, wheels are exact child joints). Impulse joints went soft under the 90 kg frame vs ~2 kg parts and let the fork fold. Multibody joints have no motors/limits in the JS API, so springs, damping, steering arms and end stops are explicit equal-and-opposite force/torque pairs.
+- If impulse joints are ever used: `JointData.limits` is ignored for revolute joints — call `joint.setLimits()` after creation.
+- Wheel colliders have zero friction; `src/bike/Tire.js` reads normal load from contact impulses and applies all grip forces. Explicit stiff forces (tire, brakes) are capped so they can't overshoot zero slip in one step — keep that guard when tuning.
+- Ground strips map collider handle → surface name (`Ground.surfaceOf`); grip per surface lives in `CONFIG.surfaces`.
+- Headless tuning: the physics modules run in Node (no DOM needed except `Input`/visuals), which is handy for scripted ride tests.
 - Deployed to GitHub Pages via `.github/workflows/deploy.yml`; `vite.config.js` uses `base: './'` so it works under any repo path.

@@ -13,6 +13,7 @@ export class Physics {
     this.RAPIER = RAPIER;
     this.world = new RAPIER.World(CONFIG.physics.gravity);
     this.world.timestep = CONFIG.physics.timestep;
+    this.world.numSolverIterations = CONFIG.physics.solverIterations;
   }
 
   step() {
